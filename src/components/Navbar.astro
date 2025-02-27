@@ -1,64 +1,57 @@
 ---
-
+const { theme } = Astro.props;
 ---
 
-<header>
-  <!-- Menu -->
-  <div class="menu-area menu-area-two">
-    <div class="container container-semi-large">
-      <div class="row align-items-center position-relative">
-        <div class="col-lg-3 hamburger-menu position-relative">
-          <div class="menu-logo-wrap">
-            <a href="index.html"><img src="/assets/images/logo.svg" alt="" /></a
-            >
-          </div>
+<header
+  class={`menu-area ${theme === "dark" ? "menu-area-two" : "menu-area-text-white"}`}
+>
+  <div class="container container-semi-large">
+    <div class="row align-items-center position-relative">
+      <div class="col-lg-3 hamburger-menu position-relative">
+        <div class="menu-logo-wrap">
+          <a href="index.html">
+            <img
+              src={theme === "dark"
+                ? "/assets/images/logo.svg"
+                : "/assets/images/logo-color-white.svg"}
+              alt="Logo"
+            />
+          </a>
         </div>
-        <div class="col-lg-9 d-none d-lg-block">
-          <div
-            class="nav-wrap d-flex justify-content-between align-items-center"
+      </div>
+      <div class="col-lg-9 d-none d-lg-block">
+        <div class="nav-wrap d-flex justify-content-between align-items-center">
+          <nav
+            class={`mainmenu ${theme === "dark" ? "" : "mainmenu-white"} text-right`}
           >
-            <nav class="mainmenu text-right">
-              <ul class="home-menu">
-                <li><a href="/">Home</a></li>
+            <ul class="home-menu">
+              <li><a href="/">Home</a></li>
 
-                <li class="has-child-menu">
-                  <a href="javascript:void(0)">Services</a>
-                  <ul>
-                    <li><a href="blog-classic.html">Marketing</a></li>
-                    <li><a href="blog-single.html">Web Development</a></li>
-                    <li>
-                      <a href="blog-classic.html">Software Development</a>
-                    </li>
-                    <li><a href="blog-single.html">Designing</a></li>
-                  </ul>
-                </li>
-                <li><a href="about.html">About</a></li>
-                <li><a href="about.html">Blog</a></li>
-                <li><a href="contact.html">Fun Corner</a></li>
-                <li><a href="/contact">Contact</a></li>
-              </ul>
-              <div class="menu-btn-wrap flex-shrink-0 d-lg-none pb-5 pt-3 ps-4">
-                <a
-                  class="common-design-btn only-border border-white"
-                  href="contact.html"
-                >
-                  <span class="btn-flip">
-                    <span data-text="Let's Connect">Let's Connect</span>
-                  </span>
-                </a>
-              </div>
-            </nav>
-            <div class="menu-btn-wrap flex-shrink-0 d-none d-lg-block">
-              <a class="common-design-btn only-border" href="contact.html">
-                <span class="btn-flip">
-                  <span data-text="Let's Connect">Let's Connect</span>
-                </span>
-              </a>
-            </div>
+              <li class="has-child-menu">
+                <a href="javascript:void(0)">Services</a>
+                <ul>
+                  <li><a href="blog-classic.html">Service 1</a></li>
+                  <li><a href="blog-single.html">Service 2</a></li>
+                </ul>
+              </li>
+
+              <li><a href="contact.html">About</a></li>
+              <li><a href="contact.html">Blog</a></li>
+              <li><a href="contact.html">Fun Corner</a></li>
+            </ul>
+          </nav>
+          <div class="menu-btn-wrap flex-shrink-0 d-none d-lg-block">
+            <a
+              class={`common-design-btn only-border ${theme === "dark" ? "" : "border-white"}`}
+              href="/contact"
+            >
+              <span class="btn-flip">
+                <span data-text="Let's Connect">Let's Connect</span>
+              </span>
+            </a>
           </div>
         </div>
       </div>
     </div>
   </div>
-  <!-- Menu end -->
 </header>
