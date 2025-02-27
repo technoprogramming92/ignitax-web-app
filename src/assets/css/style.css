@@ -540,7 +540,7 @@ body::-webkit-scrollbar-thumb {
   left: 0;
   top: 50%;
   transform: translateY(-50%);
-  background-image: url(../images/icons/bracket-left.svg);
+  background-image: url(/assets/images/icons/bracket-left.svg);
   content: "";
   width: 10px;
   height: 22px;
@@ -551,14 +551,14 @@ body::-webkit-scrollbar-thumb {
 .section-title-two span::after {
   left: auto;
   right: 0;
-  background-image: url(../images/icons/bracket-right.svg);
+  background-image: url(/assets/images/icons/bracket-right.svg);
 }
 .section-title-two.white-text span::before,
 .section-title-two.white-text span::after {
-  background-image: url(../images/icons/bracket-left-white.svg);
+  background-image: url(/assets/images/icons/bracket-left-white.svg);
 }
 .section-title-two.white-text span::after {
-  background-image: url(../images/icons/bracket-right-white.svg);
+  background-image: url(/assets/images/icons/bracket-right-white.svg);
 }
 .section-title-two .corporate-sec-desc {
   font-size: 20px;
@@ -799,7 +799,7 @@ body::-webkit-scrollbar-thumb {
       rgba(26, 26, 26, 0.1) 100%,
       rgba(26, 26, 26, 0.1) 100%
     ),
-    url(../images/breadcrumb.png);
+    url(/assets/images/breadcrumb.png);
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
@@ -1514,7 +1514,7 @@ blockquote.wp-block-quote cite {
 5. Team CSS
 =================================================*/
 .team-box .team-img {
-  background-image: url(../images/team/tm-bg.png);
+  background-image: url(/assets/images/team/tm-bg.png);
   height: 420px;
   padding: 20px 20px 0;
   border-radius: 12px;
@@ -2665,7 +2665,7 @@ blockquote.wp-block-quote cite {
 }
 
 .play-btn-wrap {
-  background-image: url(../images/about.png);
+  background-image: url(/assets/images/about.png);
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
@@ -2877,7 +2877,7 @@ blockquote.wp-block-quote cite {
   height: 100%;
   width: 100%;
   max-width: 500px;
-  background-image: url(../images/shape/about-portfolio.svg);
+  background-image: url(/assets/images/shape/about-portfolio.svg);
   background-repeat: no-repeat;
   background-size: 100% 100%;
   z-index: -1;
@@ -3083,7 +3083,7 @@ blockquote.wp-block-quote cite {
 }
 
 .footer-wrapper {
-  background-image: url(../images/footer-bg.png);
+  background-image: url(/assets/images/footer-bg.png);
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
@@ -3275,7 +3275,7 @@ blockquote.wp-block-quote cite {
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
-  background-image: url(../images/hero/hero-bg.png);
+  background-image: url(/assets/images/hero/hero-bg.png);
 }
 @media only screen and (max-width: 991.98px) {
   .hero-area.design-one {
@@ -3286,7 +3286,7 @@ blockquote.wp-block-quote cite {
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
-  background-image: url(../images/hero/corporate-hero-bg.png);
+  background-image: url(/assets/images/hero/corporate-hero-bg.png);
   padding: 240px 0 137px;
 }
 .hero-area.hero-area-corporate::before {
@@ -3295,7 +3295,7 @@ blockquote.wp-block-quote cite {
   width: 100%;
   left: 0;
   top: 0;
-  background-image: url(../images/hero/corporate-hero-layer.png);
+  background-image: url(/assets/images/hero/corporate-hero-layer.png);
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
