@@ -1,5 +1,6 @@
 ---
-
+import { Icon } from "astro-icon/components";
+const props = Astro.props;
 ---
 
 <footer class="footer-two-area bg_dp_black">
@@ -12,7 +13,14 @@
           <div class="footer-two-company-info text-center text-lg-start">
             <h2 class="text_light_white bounce-text">IGNITAX</h2>
 
-            <img src="/assets/images/footer-two-logo.svg" alt="" />
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3553.1727410582016!2d72.5403329!3d22.997035399999998!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x395e85480247891b%3A0x7b58ed03d93c3e66!2sIgnitax!5e1!3m2!1sen!2sin!4v1740648305518!5m2!1sen!2sin"
+              width="500"
+              height="350"
+              style="border:0;"
+              allowfullscreen=""
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade"></iframe>
           </div>
         </div>
       </div>
@@ -23,6 +31,7 @@
             <li><a href="about.html">Services</a></li>
             <li><a href="contact.html">About</a></li>
             <li><a href="career.html">Fun Corner</a></li>
+            <li><a href="career.html">Blog</a></li>
             <li><a href="portfolio-grid.html">Contact</a></li>
           </ul>
         </div>
@@ -31,64 +40,105 @@
         <div class="footer-widgets-two">
           <div class="footer-two-address-wrap d-flex flex-column">
             <div class="address-info-box text-center text-lg-start">
-              <h2 class="text_light_white footer-address-title">Location</h2>
-              <p class="text_light_white">
-                A-427, Siddhivinayak Arcade, Beside Cancer society, Gupta Nagar,
-                Vasna, Ahmedabad, Gujarat 380051
-              </p>
-            </div>
-            <div class="address-info-box text-center text-lg-start">
-              <h2 class="text_light_white footer-address-title">Follow Us</h2>
+              <h2 class="text_light_white footer-address-title">
+                We are available for you
+              </h2>
               <ul
                 class="custom-ul address-info-social d-flex justify-content-center justify-content-lg-start flex-wrap gap-3"
               >
-                <li><a href="#">FB</a></li>
-                <li><a href="#">LN</a></li>
-                <li><a href="#">IN</a></li>
-                <li><a href="#">BE</a></li>
+                <li>
+                  <a href="#"><Icon name="ic:baseline-facebook" size={25} /></a>
+                </li>
+                <li><a href="#"><Icon name="mdi:linkedin" size={25} /></a></li>
+                <li><a href="#"><Icon name="mdi:instagram" size={25} /></a></li>
               </ul>
+            </div>
+            <div>
+              <div class="footer-widgets">
+                <h3 class="h3 footer-title text-white">Contact</h3>
+                <div class="footer-address-info d-flex flex-column">
+                  <p>
+                    <svg
+                      class="text_light_white"
+                      width="30"
+                      height="30"
+                      viewBox="0 0 30 30"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <g clip-path="url(#clip0_2560_1852)">
+                        <path
+                          d="M15 0C6.72896 0 0 6.72896 0 15C0 23.271 6.72896 30 15 30C23.271 30 30 23.271 30 15C30 6.72896 23.271 0 15 0ZM15 28.5938C7.50439 28.5938 1.40625 22.4956 1.40625 15C1.40625 7.50439 7.50439 1.40625 15 1.40625C22.4956 1.40625 28.5938 7.50439 28.5938 15C28.5938 22.4956 22.4956 28.5938 15 28.5938ZM20.7826 16.3844C20.414 16.0167 19.9146 15.8101 19.3939 15.8101C18.8732 15.8101 18.3738 16.0167 18.0052 16.3844L17.3121 17.0777C17.2292 17.1645 17.1197 17.2212 17.001 17.239C16.8823 17.2567 16.761 17.2345 16.6563 17.1758C15.024 16.3111 13.689 14.9761 12.8242 13.3438C12.7656 13.2391 12.7434 13.1178 12.7611 12.9991C12.7789 12.8804 12.8357 12.771 12.9224 12.6881L13.6158 11.9948C13.9835 11.6262 14.19 11.1268 14.19 10.6061C14.19 10.0854 13.9835 9.58604 13.6158 9.21744L11.0661 6.66797C10.6975 6.30027 10.1981 6.09378 9.6774 6.09378C9.15675 6.09378 8.65735 6.30027 8.28873 6.66797C8.19328 6.76348 8.06391 6.8857 7.92691 7.0152C7.51605 7.40344 7.05047 7.84342 6.81152 8.19293C5.86816 9.57369 5.8541 11.4653 6.77016 13.6632C7.53838 15.5064 8.941 17.5011 10.7198 19.2798C12.4986 21.0585 14.4932 22.4614 16.3364 23.2295C17.419 23.6807 18.4272 23.9062 19.3368 23.9062C20.2738 23.9062 21.1063 23.6668 21.8068 23.1882C22.1563 22.9494 22.5962 22.484 22.9845 22.0733C23.1141 21.9362 23.2365 21.8066 23.3321 21.711C23.6999 21.3425 23.9064 20.843 23.9064 20.3224C23.9064 19.8017 23.6999 19.3023 23.3321 18.9337L20.7826 16.3844ZM22.3377 20.7167C22.2281 20.8263 22.099 20.9628 21.9623 21.1075C21.6568 21.4308 21.2384 21.8736 21.0137 22.0271C19.79 22.863 18.0891 22.4366 16.8775 21.9316C15.1999 21.2324 13.3662 19.9375 11.7142 18.2855C10.0622 16.6335 8.7675 14.7999 8.0683 13.1224C7.5634 11.9109 7.13666 10.21 7.97285 8.98623C8.12637 8.76147 8.5694 8.34281 8.89277 8.03701C9.03721 7.90055 9.17361 7.77164 9.28318 7.66201C9.38805 7.55805 9.52974 7.49971 9.6774 7.49971C9.82507 7.49971 9.96676 7.55805 10.0716 7.66201L12.6211 10.2118C12.7255 10.3164 12.7841 10.4582 12.7841 10.606C12.7841 10.7538 12.7255 10.8956 12.6211 11.0002L11.9278 11.6935C11.6291 11.9899 11.434 12.3749 11.3717 12.7911C11.3094 13.2073 11.3832 13.6324 11.5821 14.0033C12.5782 15.8837 14.1161 17.4216 15.9966 18.4178C16.3674 18.6166 16.7926 18.6904 17.2088 18.6281C17.625 18.5658 18.01 18.3708 18.3064 18.0721L18.9997 17.3789C19.1046 17.2749 19.2463 17.2166 19.3939 17.2166C19.5416 17.2166 19.6833 17.2749 19.7882 17.3789L22.3377 19.9284C22.4417 20.0332 22.5 20.1749 22.5 20.3226C22.5 20.4703 22.4417 20.612 22.3377 20.7168V20.7167Z"
+                          fill="currentColor"></path>
+                      </g>
+                      <defs>
+                        <clipPath id="clip0_2560_1852">
+                          <rect width="30" height="30" fill="white"></rect>
+                        </clipPath>
+                      </defs>
+                    </svg>
+                    <a class="text_light_white" href="tel:+91-9328514323"
+                      >+880 000 1111 111</a
+                    >
+                  </p>
+                  <p>
+                    <Icon name="ic:outline-email" size={30} />
+                    <a class="text_light_white" href="mailto:info@ignitax.com"
+                      >info@ignitax.com</a
+                    >
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-  <div class="container-fluid pe-0 ps-0">
-    <div class="col-lg-12">
-      <div class="swiper footer-two-touch">
-        <div class="swiper-wrapper">
-          <div class="swiper-slide">
-            <h2
-              class="text_light_white footer-two-touch-text d-flex align-items-center"
-            >
-              <svg
-                width="70"
-                height="70"
-                viewBox="0 0 70 70"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
+    <div class="container-fluid pe-0 ps-0">
+      <div class="col-lg-12">
+        <div class="swiper footer-two-touch">
+          <div class="swiper-wrapper">
+            <div class="swiper-slide">
+              <h2
+                class="text_light_white footer-two-touch-text d-flex align-items-center"
               >
-                <path
-                  d="M19.4393 61.0897L10.018 51.6685L45.6523 16.034L46.6766 15.0097L45.228 15.0097L1.54986 15.0097L17.377 0.600005L54.3101 0.600011L69.3199 0.600014L69.3199 15.6097L69.3199 52.6211L54.9101 68.4496L54.9101 27.0687L54.9101 25.6202L53.8858 26.6444L19.4393 61.0897Z"
-                  stroke="#FFFCF4"
-                  stroke-width="1.2"></path>
-              </svg>
-              GET IN TOUCH
-            </h2>
+                <svg
+                  width="70"
+                  height="70"
+                  viewBox="0 0 70 70"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M19.4393 61.0897L10.018 51.6685L45.6523 16.034L46.6766 15.0097L45.228 15.0097L1.54986 15.0097L17.377 0.600005L54.3101 0.600011L69.3199 0.600014L69.3199 15.6097L69.3199 52.6211L54.9101 68.4496L54.9101 27.0687L54.9101 25.6202L53.8858 26.6444L19.4393 61.0897Z"
+                    stroke="#FFFCF4"
+                    stroke-width="1.2"></path>
+                </svg>
+                GET IN TOUCH
+              </h2>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-  <div class="container container-semi-large">
-    <div class="row">
-      <div class="col-lg-12">
-        <div class="pt-3 pb-3 d-flex flex-wrap justify-content-center">
-          <p class="text_light_white">
-            © 2025 All Rights Reserved By <a href="https://ignitax">IGNITAX</a>
-          </p>
+    <div class="container container-semi-large">
+      <div class="row">
+        <div class="col-lg-12">
+          <div class="pt-3 pb-3 d-flex flex-wrap justify-content-center">
+            <p class="text_light_white">
+              © 2025 All Rights Reserved By <a href="https://ignitax"
+                >IGNITAX</a
+              >
+            </p>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </footer>
+
+<style lang="css">
+  [data-icon] {
+    color: white;
+  }
+</style>

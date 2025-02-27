@@ -799,7 +799,7 @@ body::-webkit-scrollbar-thumb {
       rgba(26, 26, 26, 0.1) 100%,
       rgba(26, 26, 26, 0.1) 100%
     ),
-    url(/assets/images/breadcrumb.png);
+    url(/assets/images/breadcrumb2.jpg);
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
@@ -812,7 +812,7 @@ body::-webkit-scrollbar-thumb {
 }
 
 .breadcrumb-info h1 {
-  color: #fff;
+  color: #1a1a1a;
   font-size: 110px;
   font-weight: 500;
   line-height: 120%;
@@ -829,12 +829,12 @@ body::-webkit-scrollbar-thumb {
 }
 .breadcrumb-info p {
   gap: 10px;
-  color: #fff;
+  color: #1a1a1a;
   font-size: 18px;
   font-weight: 500;
 }
 .breadcrumb-info p a {
-  color: #848484;
+  color: #2e2d2d;
 }
 
 /*================================================
