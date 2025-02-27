@@ -3699,7 +3699,7 @@ blockquote.wp-block-quote cite {
 .work-box .work-desc {
   overflow: hidden;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   transition: all 0.4s;
   opacity: 0;
