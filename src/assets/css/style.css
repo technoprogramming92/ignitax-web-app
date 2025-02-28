@@ -39,8 +39,8 @@ Template Name: Axole
   --ff-inter-sans: "Instrument Sans", sans-serif;
   --ff-unbounded: "Unbounded", sans-serif;
   /*Color Variable*/
-  --color-primary-blue: #836fff;
-  --color-secondary-green: #65da7c;
+  --color-primary-blue: #1b9a9a;
+  --color-secondary-green: #1b9a9a;
   --color-orange: #fe5f5e;
   --color-brown: #d2b48c;
   --color-black: #1a1a1a;
@@ -313,7 +313,7 @@ body::-webkit-scrollbar-thumb {
   left: 0;
   width: 100%;
   height: 100%;
-  background: #65da7c;
+  background: #1b9a9a;
 }
 .loader .progress-wrapper,
 .loader .revealer {
@@ -1571,7 +1571,7 @@ blockquote.wp-block-quote cite {
   object-fit: cover;
 }
 .team-box.team-box-two .team-img .team-img-hover {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, #65da7c 100%);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, #1b9a9a 100%);
   transform: scale(1) skewX(5deg) translate(-50%, -50%);
   transform-origin: left top;
   opacity: 0;
@@ -1945,7 +1945,7 @@ blockquote.wp-block-quote cite {
   gap: 30px;
 }
 .service-two-box-wrap .service-two-box .service-two-info-wrap h2 {
-  font-size: 134px;
+  font-size: 55px;
   font-weight: 500;
   position: relative;
   line-height: 1;

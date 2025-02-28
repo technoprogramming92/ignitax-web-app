@@ -1,4 +1,6 @@
 ---
+import { Image } from "astro:assets";
+
 const { theme } = Astro.props;
 ---
 
@@ -10,11 +12,13 @@ const { theme } = Astro.props;
       <div class="col-lg-3 hamburger-menu position-relative">
         <div class="menu-logo-wrap">
           <a href="index.html">
-            <img
+            <Image
               src={theme === "dark"
-                ? "/assets/images/logo.svg"
+                ? "/assets/images/logo-new.png"
                 : "/assets/images/logo-color-white.svg"}
               alt="Logo"
+              width={150}
+              height={100}
             />
           </a>
         </div>
@@ -28,10 +32,10 @@ const { theme } = Astro.props;
               <li><a href="/">Home</a></li>
 
               <li class="has-child-menu">
-                <a href="javascript:void(0)">Services</a>
+                <a href="#">Services</a>
                 <ul>
-                  <li><a href="blog-classic.html">Service 1</a></li>
-                  <li><a href="blog-single.html">Service 2</a></li>
+                  <li><a href="#">Service 1</a></li>
+                  <li><a href="#">Service 2</a></li>
                 </ul>
               </li>
 
