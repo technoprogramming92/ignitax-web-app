@@ -1,0 +1,125 @@
+---
+import CoreLayoutWhite from "../components/CoreLayout-white.astro";
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout>
+  <CoreLayoutWhite>
+    <!-- Breadcrumb -->
+
+    <section class="breadcrumb-area">
+      <div class="container container-semi-large">
+        <div class="row">
+          <div class="col-lg-12">
+            <div
+              class="breadcrumb-info text-center text-lg-start"
+              data-lag="0.2"
+              data-stagger="0.08"
+            >
+              <h1>Contact Us</h1>
+              <p
+                class="d-flex justify-content-center justify-content-lg-start align-items-center mt-2"
+              >
+                <a href="index.html">Homepage</a>
+                <svg
+                  width="25"
+                  height="2"
+                  viewBox="0 0 25 2"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    opacity="0.5"
+                    d="M0.15625 1.27637L24.1562 1.27637"
+                    stroke="white"></path>
+                </svg>
+                Contact Us
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Breadcrumb End -->
+
+    <!-- Contact Form -->
+
+    <section class="contact-form-area section-margin-bottom section-margin-top">
+      <div class="container container-semi-large">
+        <div class="row justify-content-between align-items-center gy-5">
+          <div class="col-lg-6">
+            <div class="contact-form-wrap">
+              <h3 class="h3">Send Us a Message</h3>
+              <form
+                class="contact-form-tools mt-4 d-flex flex-column gap-4"
+                action="#"
+              >
+                <input class="w-100" type="text" placeholder="Full Name" />
+                <input class="w-100" type="text" placeholder="Subject" />
+                <textarea class="w-100" rows="5" cols="50" placeholder="Message"
+                ></textarea>
+                <button
+                  class="contact-btn d-block w-100 bg-transparent fnt-weight-500"
+                  >Let’s Talk</button
+                >
+              </form>
+            </div>
+          </div>
+          <div class="col-lg-5">
+            <div class="section-title-two">
+              <h2 class="h2 char-animation">GET IN Touch</h2>
+            </div>
+            <div
+              class="contact-desc mt-2 mt-lg-5 d-flex align-items-center gap-3"
+            >
+              <svg
+                width="56"
+                height="54"
+                viewBox="0 0 56 54"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M23.0183 5.17817C24.3967 0.0980434 31.6033 0.0980434 32.9817 5.17816C34.1241 9.38824 38.733 11.6078 42.7368 9.87597C47.568 7.78628 52.0612 13.4206 48.9489 17.6657C46.3696 21.1837 47.5079 26.171 51.3582 28.2215C56.0042 30.6959 54.4006 37.7217 49.1411 37.9351C44.7824 38.112 41.5929 42.1115 42.3904 46.4003C43.3526 51.5754 36.8598 54.7022 33.4137 50.7232C30.5577 47.4258 25.4422 47.4258 22.5863 50.7232C19.1402 54.7022 12.6474 51.5754 13.6096 46.4003C14.4071 42.1115 11.2176 38.112 6.85889 37.9351C1.5994 37.7217 -0.00419617 30.6959 4.64182 28.2215C8.49214 26.171 9.63044 21.1837 7.05113 17.6657C3.93878 13.4205 8.43196 7.78628 13.2632 9.87597C17.267 11.6078 21.8759 9.38823 23.0183 5.17817Z"
+                  stroke="#1A1A1A"
+                  stroke-width="2"></path>
+              </svg>
+              <p>
+                Reach out to us with any questions, feedback, or support needs.
+              </p>
+            </div>
+            <div
+              class="about-info-wrap border-section d-flex align-items-center justify-content-between flex-column flex-md-row"
+            >
+              <div
+                class="skill-info fun-fact contact d-flex align-items-center fade_left"
+              >
+                <h4 class="counter-item flex-shrink-0">
+                  <span class="odometer d-inline-block" data-odometer-final="25"
+                    >.</span
+                  >
+                  <em>+</em>
+                </h4>
+                <p>Successfully Completed Project</p>
+              </div>
+              <div
+                class="skill-info fun-fact contact d-flex align-items-center fade_left"
+              >
+                <h4 class="counter-item flex-shrink-0">
+                  <span class="odometer d-inline-block" data-odometer-final="6"
+                    >.</span
+                  >
+                  <em>k+</em>
+                </h4>
+                <p>Successfully Completed Project</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact Form End -->
+  </CoreLayoutWhite>
+</Layout>
