@@ -10,8 +10,17 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@contentful/rich-text-html-renderer": "^17.0.0",
+    "@contentful/rich-text-plain-text-renderer": "^17.0.0",
+    "@contentful/rich-text-react-renderer": "^16.0.1",
+    "@contentful/rich-text-types": "^17.0.0",
+    "@example/basics": "link:",
+    "@tailwindcss/vite": "^4.0.9",
     "astro": "^5.4.1",
-    "astro-icon": "^1.1.5"
+    "astro-icon": "^1.1.5",
+    "contentful": "^11.5.3",
+    "dotenv": "^16.4.7",
+    "tailwindcss": "^4.0.9"
   },
   "pnpm": {
     "ignoredBuiltDependencies": [
