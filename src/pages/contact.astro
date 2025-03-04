@@ -53,12 +53,39 @@ import Layout from "../layouts/Layout.astro";
               <h3 class="h3">Send Us a Message</h3>
               <form
                 class="contact-form-tools mt-4 d-flex flex-column gap-4"
-                action="#"
+                action="https://formsubmit.co/ignitax@gmail.com"
+                method="post"
               >
-                <input class="w-100" type="text" placeholder="Full Name" />
-                <input class="w-100" type="text" placeholder="Subject" />
-                <textarea class="w-100" rows="5" cols="50" placeholder="Message"
-                ></textarea>
+                <input
+                  class="w-100"
+                  type="text"
+                  name="name"
+                  placeholder="Full Name"
+                />
+                <input
+                  class="w-100"
+                  type="text"
+                  name="email"
+                  placeholder="Email"
+                />
+                <input
+                  class="w-100"
+                  type="text"
+                  name="contact"
+                  placeholder="Contact"
+                />
+                <input
+                  class="w-100"
+                  type="text"
+                  name="subject"
+                  placeholder="Subject"
+                />
+                <textarea
+                  class="w-100"
+                  rows="5"
+                  cols="50"
+                  name="message"
+                  placeholder="Message"></textarea>
                 <button
                   class="contact-btn d-block w-100 bg-transparent fnt-weight-500"
                   >Let’s Talk</button

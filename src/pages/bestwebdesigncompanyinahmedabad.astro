@@ -469,15 +469,36 @@ import { Icon } from "astro-icon/components";
               <h3 class="h3">Get a Free Quote</h3>
               <form
                 class="contact-form-tools mt-4 d-flex flex-column gap-4"
-                action="#"
+                action="https://formsubmit.co/ignitax@gmail.com"
+                method="post"
               >
-                <input class="w-100" type="text" placeholder="Full Name" />
-                <input class="w-100" type="text" placeholder="Contact Number" />
-                <input class="w-100" type="email" placeholder="Email Address" />
-                <input class="w-100" type="text" placeholder="City" />
+                <input
+                  class="w-100"
+                  type="text"
+                  name="name"
+                  placeholder="Full Name"
+                />
+                <input
+                  class="w-100"
+                  type="text"
+                  name="contact"
+                  placeholder="Contact Number"
+                />
+                <input
+                  class="w-100"
+                  type="email"
+                  name="email"
+                  placeholder="Email Address"
+                />
+                <input
+                  class="w-100"
+                  type="text"
+                  name="city"
+                  placeholder="City"
+                />
                 <button
                   class="contact-btn d-block w-100 bg-transparent fnt-weight-500"
-                  >Let’s Talk</button
+                  type="submit">Let’s Talk</button
                 >
               </form>
             </div>
