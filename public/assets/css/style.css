@@ -331,7 +331,7 @@ body::-webkit-scrollbar-thumb {
   overflow: hidden;
 }
 .loader .progress-line {
-  background: #000;
+  background: #1b9a9a;
   width: 0%;
   height: 100%;
   display: block;
