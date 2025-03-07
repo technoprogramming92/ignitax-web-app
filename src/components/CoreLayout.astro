@@ -67,7 +67,7 @@ import { Icon } from "astro-icon/components";
                     <a href="/blogs">Blog</a>
                   </li>
 
-                  <li><a href="contact.html">Fun Corner</a></li>
+                  <!-- <li><a href="contact.html">Fun Corner</a></li> -->
                 </ul>
                 <div
                   class="menu-btn-wrap flex-shrink-0 d-lg-none pb-5 pt-3 ps-4"
@@ -126,11 +126,11 @@ import { Icon } from "astro-icon/components";
             <div class="col-lg-3">
               <div class="footer-widgets-two">
                 <ul class="custom-ul footer-two-menu">
-                  <li><a href="index.html">Home</a></li>
-                  <li><a href="about.html">About</a></li>
-                  <li><a href="contact.html">Services</a></li>
-                  <li><a href="career.html">Blog</a></li>
-                  <li><a href="portfolio-grid.html">Contact</a></li>
+                  <li><a href="/">Home</a></li>
+                  <li><a href="#">About</a></li>
+                  <li><a href="/webdev-service">Services</a></li>
+                  <li><a href="/blogs">Blog</a></li>
+                  <li><a href="/contact">Contact</a></li>
                 </ul>
               </div>
             </div>
@@ -142,8 +142,14 @@ import { Icon } from "astro-icon/components";
                       Reach Us At
                     </h2>
                     <ul
-                      class="footer-social color-green custom-ul d-flex flex-wrap align-items-center"
+                      class="footer-social color-green custom-ul d-flex flex-col align-items-left"
                     >
+                      <li>
+                        <a href="mailto:ignitax@gmail.com">
+                          <Icon name="line-md:email-check" size={26} />
+                          services@ignitax.com
+                        </a>
+                      </li>
                       <li>
                         <a href="mailto:ignitax@gmail.com">
                           <Icon name="line-md:email-check" size={26} />
@@ -166,15 +172,25 @@ import { Icon } from "astro-icon/components";
                       class="custom-ul address-info-social d-flex justify-content-center justify-content-lg-start flex-wrap gap-3"
                     >
                       <li>
-                        <a href="#"
+                        <a
+                          href="https://www.facebook.com/p/Ignitax-61552055575373"
+                          target="_blank"
                           ><Icon name="ic:baseline-facebook" size={25} /></a
                         >
                       </li>
                       <li>
-                        <a href="#"><Icon name="mdi:linkedin" size={25} /></a>
+                        <a
+                          href="https://in.linkedin.com/company/ignitax-virtualserviceandassisstant"
+                          target="_blank"
+                          ><Icon name="mdi:linkedin" size={25} /></a
+                        >
                       </li>
                       <li>
-                        <a href="#"><Icon name="mdi:instagram" size={25} /></a>
+                        <a
+                          href="https://www.instagram.com/ignitax_/"
+                          target="_blank"
+                          ><Icon name="mdi:instagram" size={25} /></a
+                        >
                       </li>
                     </ul>
                   </div>
@@ -234,5 +250,12 @@ import { Icon } from "astro-icon/components";
 <style lang="css">
   [data-icon] {
     color: white;
+  }
+
+  @media screen and (max-width: 750px) {
+    .footer-widgets-two,
+    ul {
+      align-items: center;
+    }
   }
 </style>

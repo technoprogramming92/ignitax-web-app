@@ -25,7 +25,7 @@ import { Icon } from "astro-icon/components";
                 has Aesthetic look, Mobile Responsive, Fast Loading, Content
                 Richness and Graphical Richness.
               </p>
-              <a class="common-design-btn white-bg" href="contact.html">
+              <a class="common-design-btn white-bg" href="/contact">
                 <span class="btn-flip">
                   <span data-text="Get Free Quotation">Get Free Quotation</span>
                 </span>
@@ -571,25 +571,27 @@ import { Icon } from "astro-icon/components";
                   type="text"
                   name="name"
                   placeholder="Full Name"
+                  required
                 />
                 <input
                   class="w-100"
-                  type="text"
+                  type="tel"
                   name="contact"
-                  placeholder="Contact Number"
+                  placeholder="Phone Number"
+                  required
                 />
                 <input
                   class="w-100"
                   type="email"
                   name="email"
                   placeholder="Email Address"
+                  required
                 />
-                <input
+                <textarea
                   class="w-100"
-                  type="text"
-                  name="city"
-                  placeholder="City"
-                />
+                  name="Services"
+                  placeholder="services"
+                  required></textarea>
                 <button
                   class="contact-btn d-block w-100 bg-transparent fnt-weight-500"
                   type="submit">Let’s Talk</button
