@@ -563,9 +563,14 @@ import { Icon } from "astro-icon/components";
               <h3 class="h3">Get a Free Quote</h3>
               <form
                 class="contact-form-tools mt-4 d-flex flex-column gap-4"
-                action="https://formsubmit.co/ignitax@gmail.com"
+                action="https://api.web3forms.com/submit"
                 method="post"
               >
+                <input
+                  type="hidden"
+                  name="access_key"
+                  value="bc8491c5-d1a9-4e3e-bc0d-b9e572b934d2"
+                />
                 <input
                   class="w-100"
                   type="text"
