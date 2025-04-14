@@ -16,7 +16,7 @@
     "@contentful/rich-text-types": "^17.0.0",
     "@example/basics": "link:",
     "@tailwindcss/vite": "^4.0.9",
-    "astro": "^5.4.1",
+    "astro": "^5.6.1",
     "astro-icon": "^1.1.5",
     "contentful": "^11.5.3",
     "dotenv": "^16.4.7",
