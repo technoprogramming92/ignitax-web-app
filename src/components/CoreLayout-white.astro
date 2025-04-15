@@ -128,8 +128,19 @@ import { Icon } from "astro-icon/components";
               <div class="footer-widgets-two">
                 <ul class="custom-ul footer-two-menu">
                   <li><a href="/">Home</a></li>
-                  <li><a href="#">About</a></li>
-                  <li><a href="/webdev-service">Services</a></li>
+                  <li><a href="about.html">About</a></li>
+                  <li class="has-child-menu">
+                    <a href="javascript:void(0)">Services</a>
+                    <ul>
+                      <li>
+                        <a href="/webdev-service"
+                          >Software/Web/App Development</a
+                        >
+                      </li>
+                      <li><a href="/marketing-service">Brand Marketing</a></li>
+                      <li><a href="/design-service">Graphic Designing</a></li>
+                    </ul>
+                  </li>
                   <li><a href="/blogs">Blog</a></li>
                   <li><a href="/contact">Contact</a></li>
                 </ul>
