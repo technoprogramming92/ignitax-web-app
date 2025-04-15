@@ -1,281 +1,416 @@
 ---
-import Layout from "../layouts/Layout.astro";
-import CoreLayoutWhite from "../components/CoreLayout-white.astro";
+// src/pages/blog.astro (or src/pages/blog/index.astro)
+import Layout from "../layouts/Layout.astro"; // Adjust path if needed
+import CoreLayoutWhite from "../components/CoreLayout-white.astro"; // Adjust path if needed
 
-import { getAllBlogPosts } from "../lib/contentful";
-let blogPosts = [];
+// Define the expected structure for a post item
+interface PostListItem {
+  _id: string;
+  title: string;
+  slug: string;
+  excerpt?: string;
+  coverImageUrl?: string;
+  createdAt: string;
+}
+
+// Define the expected structure for pagination metadata
+interface PaginationData {
+  currentPage: number;
+  totalPages: number;
+  totalPosts: number;
+  limit: number;
+}
+
+let posts: PostListItem[] = [];
+let pagination: PaginationData | null = null;
+let fetchError: string | null = null;
+
+// --- Pagination Logic ---
+const postsPerPage = 9; // Number of posts per page (should match API default or be passed)
+const currentPage = Math.max(
+  1,
+  parseInt(Astro.url.searchParams.get("page") || "1", 10)
+);
+// ---
+
 try {
-  blogPosts = await getAllBlogPosts();
-  console.log("Blog posts fetched:", blogPosts.length);
-} catch (error) {
-  console.error("Error fetching blog posts:", error);
+  // Fetch data for the current page
+  const apiUrl = new URL("/api/posts", Astro.url.origin);
+  apiUrl.searchParams.set("page", currentPage.toString());
+  apiUrl.searchParams.set("limit", postsPerPage.toString());
+
+  const response = await fetch(apiUrl);
+  const result = await response.json();
+
+  if (!response.ok || !result.success) {
+    throw new Error(result.message || "Failed to fetch blog posts from API");
+  }
+
+  // Assign data from the nested structure
+  posts = result.data.posts;
+  pagination = result.data.pagination;
+
+  console.log(
+    `Blog posts fetched (Page ${pagination?.currentPage}/${pagination?.totalPages}):`,
+    posts.length
+  );
+} catch (error: any) {
+  console.error("Error fetching blog posts from API:", error);
+  fetchError = error.message || "Could not load blog posts.";
+  posts = []; // Ensure posts is empty on error
+  pagination = null; // Ensure pagination is null on error
 }
 ---
 
-<Layout>
+<Layout title={`Blog - Page ${currentPage}`}>
   <CoreLayoutWhite>
-    <!-- Breadcrumb -->
-
+    {/* Breadcrumb (Optional - Simplified) */}
     <section class="breadcrumb-area">
       <div class="container container-semi-large">
         <div class="row">
           <div class="col-lg-12">
-            <div
-              class="breadcrumb-info text-center text-lg-start"
-              data-lag="0.2"
-              data-stagger="0.08"
-            >
+            <div class="breadcrumb-info text-center text-lg-start">
               <h1>Blog</h1>
               <p
                 class="d-flex justify-content-center justify-content-lg-start align-items-center mt-2"
               >
-                <a href="index.html">Homepage</a>
+                <a href="/">Homepage</a>
                 <svg
                   width="25"
                   height="2"
                   viewBox="0 0 25 2"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
+                  style="margin: 0 0.5rem;"
                 >
                   <path
                     opacity="0.5"
                     d="M0.15625 1.27637L24.1562 1.27637"
-                    stroke="white"></path>
+                    stroke="currentColor"></path>
                 </svg>
-                Blog
+                Blog {
+                  pagination && pagination.totalPages > 1
+                    ? `(Page ${currentPage} of ${pagination.totalPages})`
+                    : ""
+                }
               </p>
             </div>
           </div>
         </div>
       </div>
     </section>
+    {/* Breadcrumb End */}
 
-    <!-- Breadcrumb End -->
-
-    <!-- Blog -->
-
-    <section class="blog-area section-margin-top section-margin-bottom">
+    {/* Blog Grid Section */}
+    <section class="blog-grid-area section-margin-top section-margin-bottom">
       <div class="container container-semi-large">
-        <div class="row gy-5 gx-lg-5">
-          <div class="col-lg-8">
-            <div class="blog-wrapper d-flex flex-column gap-4 gap-lg-5">
-              {
-                blogPosts.map((post) => (
-                  <div class="blog-two-box">
-                    <div class="blog-two-img position-relative overflow-hidden">
-                      <img
-                        class="w-100 h-100 ft_object position-absolute top-0 start-0"
-                        src={`https:${post.image.fields.file.url}`}
-                        alt=""
-                      />
-                    </div>
-                    <div class="blog-two-info mt-3">
-                      <p class="text_black d-flex align-items-center gap-2 mt-1 flex-wrap">
-                        <time
-                          datetime={new Date(post.publishDate).toISOString()}
-                        >
-                          {new Date(post.publishDate).toLocaleDateString(
-                            "en-US",
-                            {
-                              year: "numeric",
-                              month: "long",
-                              day: "numeric",
-                            }
-                          )}
-                        </time>
-                        <svg
-                          width="18"
-                          height="2"
-                          viewBox="0 0 18 2"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path opacity="0.14" d="M0 1H18" stroke="#1A1A1A" />
-                        </svg>
-                        <a href="#">By {post.author}</a>
-                      </p>
-                      <h2 class="h2 blog-two-title mt-2">
-                        <a href={`/blog/${post.slug}`}>{post.title}</a>
-                      </h2>
-                    </div>
-                  </div>
-                ))
-              }
-            </div>
-            <div class="row row-top-margin">
-              <div class="col-lg-12">
-                <ul
-                  class="page-list custom-ul d-flex justify-content-center flex-wrap gap-4"
-                >
-                  <li><a href="#"><i class="bi bi-chevron-left"></i></a></li>
-                  <li><a href="#">01</a></li>
-                  <li class="active"><a href="#">02</a></li>
-                  <li><a href="#">03</a></li>
-                  <li><a href="#"><i class="bi bi-chevron-right"></i></a></li>
-                </ul>
-              </div>
-            </div>
-          </div>
-          <div class="col-lg-4">
-            <div class="sidebar-wrap">
-              <div class="single-sidebar">
-                <form class="sidebar-search position-relative" action="#">
-                  <input class="w-100" type="search" placeholder="Search..." />
-                  <button
-                    class="border-0 p-0 m-0 position-absolute end-0 top-0 bg-transparent"
-                    type="submit"
-                  >
-                    <svg
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M10.5 18C14.6421 18 18 14.6421 18 10.5C18 6.35786 14.6421 3 10.5 3C6.35786 3 3 6.35786 3 10.5C3 14.6421 6.35786 18 10.5 18Z"
-                        stroke="currentColor"
-                        stroke-width="1.5"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"></path>
-                      <path
-                        d="M21 21L16 16"
-                        stroke="currentColor"
-                        stroke-width="1.5"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"></path>
-                    </svg>
-                  </button>
-                </form>
-              </div>
-              <div class="single-sidebar">
-                <h3 class="h3 sidebar-title d-block">Categories</h3>
-                <ul class="sidebar-category custom-ul d-flex flex-column">
-                  <li>Corporate <span>(01)</span></li>
-                  <li>Innovative <span>(01)</span></li>
-                  <li>Marketing <span>(01)</span></li>
-                  <li>Technology <span>(01)</span></li>
-                  <li>Creative Design <span>(01)</span></li>
-                </ul>
-              </div>
-              <div class="single-sidebar">
-                <h3 class="h3 sidebar-title d-block">Recent Blogs</h3>
-                <div class="sidebar-recent-blog-wrap d-flex flex-column gap-4">
-                  <div
-                    class="sidebar-recent-blog d-flex flex-column flex-xl-row align-items-xl-center gap-3"
-                  >
-                    <div class="recent-blog-img w-100">
-                      <img
-                        class="w-100 ft_object"
-                        src="assets/images/blog/recent-blog-1.png"
-                        alt=""
-                      />
-                    </div>
-                    <div class="recent-blog-info">
-                      <h5 class="recent-blog-title">
-                        Creating a brand identity
-                      </h5>
-                      <p
-                        class="text_black d-flex align-items-center gap-2 mt-1 flex-wrap"
-                      >
-                        24 May, 2024
-                        <svg
-                          width="18"
-                          height="2"
-                          viewBox="0 0 18 2"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path opacity="0.14" d="M0 1H18" stroke="#1A1A1A"
-                          ></path>
-                        </svg>
-                        <a href="#">By Anderson</a>
-                      </p>
-                    </div>
-                  </div>
-                  <div
-                    class="sidebar-recent-blog d-flex flex-column flex-xl-row align-items-xl-center gap-3"
-                  >
-                    <div class="recent-blog-img w-100">
-                      <img
-                        class="w-100 ft_object"
-                        src="assets/images/blog/recent-blog-2.png"
-                        alt=""
-                      />
-                    </div>
-                    <div class="recent-blog-info">
-                      <h5 class="recent-blog-title">
-                        Axole and tech innovators
-                      </h5>
-                      <p
-                        class="text_black d-flex align-items-center gap-2 mt-1 flex-wrap"
-                      >
-                        24 May, 2024
-                        <svg
-                          width="18"
-                          height="2"
-                          viewBox="0 0 18 2"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path opacity="0.14" d="M0 1H18" stroke="#1A1A1A"
-                          ></path>
-                        </svg>
-                        <a href="#">By Anderson</a>
-                      </p>
-                    </div>
-                  </div>
-                  <div
-                    class="sidebar-recent-blog d-flex flex-column flex-xl-row align-items-xl-center gap-3"
-                  >
-                    <div class="recent-blog-img w-100">
-                      <img
-                        class="w-100 ft_object"
-                        src="assets/images/blog/recent-blog-3.png"
-                        alt=""
-                      />
-                    </div>
-                    <div class="recent-blog-info">
-                      <h5 class="recent-blog-title">
-                        Automation in digital marketing
-                      </h5>
-                      <p
-                        class="text_black d-flex align-items-center gap-2 mt-1 flex-wrap"
-                      >
-                        24 May, 2024
-                        <svg
-                          width="18"
-                          height="2"
-                          viewBox="0 0 18 2"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path opacity="0.14" d="M0 1H18" stroke="#1A1A1A"
-                          ></path>
-                        </svg>
-                        <a href="#">By Anderson</a>
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="single-sidebar">
-                <h3 class="h3 sidebar-title d-block">Popular Tags</h3>
-                <ul class="sidebar-tags custom-ul d-flex flex-wrap gap-3">
-                  <li><a href="#">Corporate</a></li>
-                  <li><a href="#">Health Care</a></li>
-                  <li><a href="#">Technology</a></li>
-                  <li><a href="#">Industry</a></li>
-                  <li><a href="#">Marketing</a></li>
-                  <li><a href="#">Innovation</a></li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
+        {/* Display Error Message */}
+        {
+          fetchError && (
+            <p class="error-message">Error loading posts: {fetchError}</p>
+          )
+        }
 
-    <!-- Blog End -->
+        {/* Display Message if No Posts Found */}
+        {
+          !fetchError && posts.length === 0 && (
+            <p class="no-posts-message">
+              No blog posts found {currentPage > 1 ? `on this page` : ""}.
+            </p>
+          )
+        }
+
+        {/* Blog Posts Grid */}
+        {
+          !fetchError && posts.length > 0 && (
+            <div class="blog-grid">
+              {posts.map((post) => (
+                <article class="blog-card" key={post._id}>
+                  {post.coverImageUrl ? (
+                    <a
+                      href={`/blog/${post.slug}/`}
+                      class="card-image-link"
+                      aria-label={`Read more about ${post.title}`}
+                    >
+                      <img
+                        src={post.coverImageUrl}
+                        alt={`${post.title} cover`}
+                        class="card-image"
+                        width="400"
+                        height="225"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    </a>
+                  ) : (
+                    <div class="card-image-placeholder" />
+                  )}
+                  <div class="card-content">
+                    <p class="card-meta">
+                      <time datetime={new Date(post.createdAt).toISOString()}>
+                        {new Date(post.createdAt).toLocaleDateString("en-US", {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        })}
+                      </time>
+                      {/* Add category/author later if needed */}
+                    </p>
+                    <h2 class="card-title h3">
+                      {" "}
+                      {/* Use h3 for card title */}
+                      <a href={`/blog/${post.slug}/`}>{post.title}</a>
+                    </h2>
+                    {post.excerpt && <p class="card-excerpt">{post.excerpt}</p>}
+                    <a href={`/blog/${post.slug}/`} class="card-read-more">
+                      Read More &rarr;
+                    </a>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )
+        }
+
+        {/* Pagination Controls */}
+        {
+          pagination && pagination.totalPages > 1 && (
+            <nav class="pagination-nav" aria-label="Blog posts pagination">
+              <ul class="pagination-list">
+                {/* Previous Page Link */}
+                <li>
+                  <a
+                    href={
+                      currentPage > 1 ? `/blog?page=${currentPage - 1}` : "#"
+                    }
+                    class:list={[
+                      "page-link prev",
+                      { disabled: currentPage <= 1 },
+                    ]}
+                    aria-disabled={currentPage <= 1}
+                    aria-label="Previous page"
+                  >
+                    &laquo; Prev
+                  </a>
+                </li>
+
+                {/* Page Number Links (Simplified Example) */}
+                {/* You might want more complex logic for many pages (e.g., ellipsis) */}
+                {Array.from(
+                  { length: pagination.totalPages },
+                  (_, i) => i + 1
+                ).map((pageNumber) => (
+                  <li>
+                    <a
+                      href={`/blog?page=${pageNumber}`}
+                      class:list={[
+                        "page-link",
+                        { active: pageNumber === currentPage },
+                      ]}
+                      aria-current={
+                        pageNumber === currentPage ? "page" : undefined
+                      }
+                      aria-label={`Go to page ${pageNumber}`}
+                    >
+                      {pageNumber}
+                    </a>
+                  </li>
+                ))}
+
+                {/* Next Page Link */}
+                <li>
+                  <a
+                    href={
+                      currentPage < pagination.totalPages
+                        ? `/blog?page=${currentPage + 1}`
+                        : "#"
+                    }
+                    class:list={[
+                      "page-link next",
+                      { disabled: currentPage >= pagination.totalPages },
+                    ]}
+                    aria-disabled={currentPage >= pagination.totalPages}
+                    aria-label="Next page"
+                  >
+                    Next &raquo;
+                  </a>
+                </li>
+              </ul>
+            </nav>
+          )
+        }
+      </div>
+      {/* End container */}
+    </section>
+    {/* Blog Grid Section End */}
   </CoreLayoutWhite>
 </Layout>
+
+{/* CSS Styles for Grid and Pagination */}
+<style>
+  .container {
+    /* Ensure container allows content flow */
+  }
+  .error-message,
+  .no-posts-message {
+    text-align: center;
+    padding: 2rem;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
+    margin-bottom: 2rem;
+  }
+  .error-message {
+    color: #dc3545;
+    border-color: #f5c6cb;
+    background-color: #f8d7da;
+  }
+
+  /* Blog Grid */
+  .blog-grid {
+    display: grid;
+    /* Adjust minmax for desired card width */
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem; /* Adjust gap between cards */
+    list-style: none;
+    padding: 0;
+    margin: 0 0 3rem 0; /* Margin below grid */
+  }
+
+  /* Blog Card Styling */
+  .blog-card {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    transition:
+      box-shadow 0.3s ease,
+      transform 0.3s ease;
+  }
+  .blog-card:hover {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transform: translateY(-5px);
+  }
+
+  .card-image-link {
+    display: block;
+  } /* Make link container block */
+  .card-image {
+    display: block;
+    width: 100%;
+    height: 200px; /* Fixed height for images */
+    object-fit: cover; /* Cover the area, might crop */
+    border-bottom: 1px solid #eee;
+    background-color: #f0f0f0; /* Placeholder color */
+  }
+  .card-image-placeholder {
+    width: 100%;
+    height: 200px;
+    background-color: #e9ecef;
+    border-bottom: 1px solid #dee2e6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #adb5bd;
+    font-style: italic;
+  }
+  .card-image-placeholder::before {
+    /* Optional placeholder text */
+    content: "No Image";
+  }
+
+  .card-content {
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1; /* Allow content to push footer down */
+  }
+  .card-meta {
+    font-size: 0.85em;
+    color: #777;
+    margin-bottom: 0.5rem;
+  }
+  .card-title {
+    font-size: 1.25rem; /* Adjust title size */
+    margin-top: 0;
+    margin-bottom: 0.75rem;
+    line-height: 1.3;
+  }
+  .card-title a {
+    text-decoration: none;
+    color: inherit;
+  }
+  .card-title a:hover {
+    color: #0056b3; /* Link hover color */
+  }
+
+  .card-excerpt {
+    font-size: 0.95rem;
+    color: #555;
+    flex-grow: 1; /* Takes up space before read more */
+    margin-bottom: 1rem;
+    /* Limit lines shown */
+    display: -webkit-box;
+    -webkit-line-clamp: 3; /* Show 3 lines */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .card-read-more {
+    display: inline-block;
+    font-weight: bold;
+    text-decoration: none;
+    color: #007bff;
+    margin-top: auto; /* Pushes to bottom if card content varies */
+  }
+  .card-read-more:hover {
+    text-decoration: underline;
+  }
+
+  /* Pagination Styling */
+  .pagination-nav {
+    margin-top: 3rem;
+  }
+  .pagination-list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem; /* Space between page links */
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+  }
+  .page-link {
+    display: block;
+    padding: 0.5rem 1rem;
+    text-decoration: none;
+    color: #007bff;
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease;
+  }
+  .page-link:hover,
+  .page-link:focus {
+    background-color: #e9ecef;
+    border-color: #adb5bd;
+  }
+  .page-link.active {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+    pointer-events: none; /* Disable clicking active page */
+    z-index: 1;
+  }
+  .page-link.disabled {
+    color: #6c757d;
+    pointer-events: none;
+    background-color: #fff;
+    border-color: #dee2e6;
+    opacity: 0.6;
+  }
+</style>

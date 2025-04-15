@@ -1,321 +1,350 @@
 ---
-import CoreLayoutWhite from "../../components/CoreLayout-white.astro";
-import Layout from "../../layouts/Layout.astro";
-import { getAllBlogPosts, getBlogPostBySlug } from "../../lib/contentful.js";
+// src/pages/blog/[slug].astro
+import CoreLayoutWhite from "../../components/CoreLayout-white.astro"; // Adjust path if needed
+import Layout from "../../layouts/Layout.astro"; // Adjust path if needed
 
-import { documentToHtmlString } from '@contentful/rich-text-html-renderer';
+// Imports for Markdown processing (replacing Contentful renderer)
+import { marked } from "marked";
+import DOMPurify from "isomorphic-dompurify";
 
-
-export async function getStaticPaths() {
-  const posts = await getAllBlogPosts();
-  
-  return posts.map(post => ({
-    params: { slug: post.slug },
-  }));
+// Define the expected structure from our API
+interface PostDetail {
+  _id: string;
+  title: string;
+  slug: string;
+  content: string; // Expecting Markdown content
+  excerpt?: string;
+  coverImageUrl?: string;
+  createdAt: string;
+  updatedAt: string;
+  // Add other fields if your API returns them (e.g., author if implemented later)
 }
 
-// Get the slug from the URL
-const { slug } = Astro.params;
+// --- Removed SSG getStaticPaths ---
+// export async function getStaticPaths() { ... } // No longer needed for SSR
 
-// Get the post data
-const post = await getBlogPostBySlug(slug);
+// --- Fetch data dynamically at request time ---
+const { slug } = Astro.params; // Get slug from URL
 
-// Convert Rich Text to HTML
-const contentHtml = post.content ? documentToHtmlString(post.content) : '';
+let post: PostDetail | null = null;
+let fetchError: string | null = null;
+let sanitizedHtmlContent: string = ""; // For processed and safe HTML content
+
+if (!slug) {
+  fetchError = "Blog post slug is missing.";
+  // Consider redirecting: return Astro.redirect('/404');
+} else {
+  try {
+    const apiUrl = new URL(`/api/posts/${slug}`, Astro.url.origin); // Fetch from our API
+    const response = await fetch(apiUrl);
+
+    if (response.status === 404) {
+      return Astro.redirect("/404"); // Redirect if post not found by API
+    }
+
+    if (!response.ok) {
+      let errorMsg = `API Error (Status: ${response.status})`;
+      try {
+        const errorResult = await response.json();
+        errorMsg = errorResult.message || errorMsg;
+      } catch {
+        /* Ignore if body isn't JSON */
+      }
+      throw new Error(errorMsg);
+    }
+
+    const result = await response.json();
+
+    if (!result.success || !result.data) {
+      throw new Error(result.message || `API fetch failed for slug: ${slug}`);
+    }
+
+    post = result.data; // Assign fetched post data
+
+    // Process Markdown content if available
+    if (post && post.content) {
+      const rawHtml = marked.parse(post.content);
+      sanitizedHtmlContent = DOMPurify.sanitize(rawHtml as string);
+    }
+  } catch (error: any) {
+    console.error(`Error fetching post "${slug}" from API:`, error);
+    fetchError = error.message || `Could not load post: ${slug}.`;
+    post = null; // Ensure post is null on error
+  }
+}
+
+// Generate description for meta tag (use excerpt or fallback)
+const metaDescription = post?.excerpt
+  ? post.excerpt.substring(0, 150) + (post.excerpt.length > 150 ? "..." : "")
+  : `Read the blog post titled: ${post?.title ?? "Blog Post"}`; // Fallback description
 ---
 
+{/* Conditional rendering based on fetch result */}
 {
-  post ? (
-    <>
-      <Layout>
-        <CoreLayoutWhite>
-          <head>
-        <title>{post.title} - Ignitax Blog</title>
-        <meta
-          name="description"
-          content={contentHtml.substring(0, 150) + "..."}
-        />
-      </head>
+  post && !fetchError ? (
+    <Layout title={`${post.title} - Ignitax Blog`}>
+      {" "}
+      {/* Use dynamic title */}
+      {/* Inject meta description */}
+      <Fragment slot="head">
+        <meta name="description" content={metaDescription} />
+        {/* Add other meta tags like OpenGraph here if needed */}
+        {post.coverImageUrl && (
+          <meta property="og:image" content={post.coverImageUrl} />
+        )}
+      </Fragment>
+      <CoreLayoutWhite>
+        {/* Breadcrumb (Kept As Is, maybe update text/links) */}
+        <section class="breadcrumb-area">
+          <div class="container container-semi-large">
+            <div class="row">
+              <div class="col-lg-12">
+                <div
+                  class="breadcrumb-info text-center text-lg-start"
+                  data-lag="0.2"
+                  data-stagger="0.08"
+                >
+                  <h1>Blog Post</h1> {/* Changed from "Blog Single" */}
+                  <p class="d-flex justify-content-center justify-content-lg-start align-items-center mt-2">
+                    <a href="/">Homepage</a> {/* Link to root */}
+                    <svg
+                      width="25"
+                      height="2"
+                      viewBox="0 0 25 2"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        opacity="0.5"
+                        d="M0.15625 1.27637L24.1562 1.27637"
+                        stroke="white"
+                      />
+                    </svg>
+                    <a href="/blog">Blog</a> {/* Link to blog list */}
+                    <svg
+                      width="25"
+                      height="2"
+                      viewBox="0 0 25 2"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        opacity="0.5"
+                        d="M0.15625 1.27637L24.1562 1.27637"
+                        stroke="white"
+                      />
+                    </svg>
+                    {post.title} {/* Current post title */}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+        {/* Breadcrumb End */}
 
-      <!-- Breadcrumb -->
+        {/* Blog Detail Section */}
+        <section class="blog-area section-margin-top section-margin-bottom">
+          <div class="container container-semi-large">
+            <div class="row gy-5 gx-lg-5">
+              <div class="col-lg-8">
+                {/* Blog Post Content Area */}
+                <div class="blog-single-wrapper">
+                  <div class="blog-single-title-info mb-5">
+                    {/* Post Title */}
+                    <h2 class="h2">{post.title}</h2>{" "}
+                    {/* Removed link around title */}
+                    <div class="blog-single-meta section-border-black pb-3 d-flex align-items-center justify-content-between mt-2 gap-2 flex-wrap">
+                      {/* Post Metadata */}
+                      <p class="text_black d-flex align-items-center gap-2 mt-1 flex-wrap">
+                        {/* Use createdAt date */}
+                        <time datetime={new Date(post.createdAt).toISOString()}>
+                          {new Date(post.createdAt).toLocaleDateString(
+                            "en-US",
+                            { year: "numeric", month: "long", day: "numeric" }
+                          )}
+                        </time>
+                        {/* Removed Author - Add back if needed */}
+                        {/* <svg>...</svg> */}
+                        {/* <a href="#">By {post.author}</a> */}
+                        {/* Show Updated Date if different */}
+                        {post.createdAt !== post.updatedAt && (
+                          <>
+                            <svg
+                              width="18"
+                              height="2"
+                              viewBox="0 0 18 2"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                opacity="0.14"
+                                d="M0 1H18"
+                                stroke="#1A1A1A"
+                              />
+                            </svg>
+                            <span>
+                              Updated:{" "}
+                              <time datetime={post.updatedAt}>
+                                {new Date(post.updatedAt).toLocaleDateString(
+                                  "en-US",
+                                  { month: "long", day: "numeric" }
+                                )}
+                              </time>
+                            </span>
+                          </>
+                        )}
+                      </p>
+                      {/* Social Share (Static) */}
+                      <div class="blog-single-share d-flex align-items-center gap-2">
+                        <span class="fnt-weight-500 text_black">
+                          Social Share:
+                        </span>
+                        <ul class="custom-ul site-social d-flex align-items-center flex-wrap gap-2">
+                          <li>
+                            <a href="#">
+                              <i class="bi bi-facebook" />
+                            </a>
+                          </li>
+                          <li>
+                            <a href="#">
+                              <i class="bi bi-linkedin" />
+                            </a>
+                          </li>
+                          <li>
+                            <a href="#">
+                              <i class="bi bi-youtube" />
+                            </a>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
 
-			<section class="breadcrumb-area">
-				<div class="container container-semi-large">
-					<div class="row">
-						<div class="col-lg-12">
-							<div class="breadcrumb-info text-center text-lg-start" data-lag="0.2" data-stagger="0.08">
-								<h1>Blog Single</h1>
-								<p class="d-flex justify-content-center justify-content-lg-start align-items-center mt-2">
-									<a href="index.html">Homepage</a>
-									<svg width="25" height="2" viewBox="0 0 25 2" fill="none" xmlns="http://www.w3.org/2000/svg">
-										<path opacity="0.5" d="M0.15625 1.27637L24.1562 1.27637" stroke="white" />
-									</svg>
-									Blog Single
-								</p>
-							</div>
-						</div>
-					</div>
-				</div>
-			</section>
+                  {/* Cover Image */}
+                  {post.coverImageUrl && (
+                    <img
+                      class="w-100 mb-3"
+                      src={post.coverImageUrl}
+                      alt={`${post.title} cover image`}
+                      loading="lazy"
+                      decoding="async"
+                      style="max-height: 450px; object-fit: cover; border-radius: 4px; background-color: #f0f0f0;"
+                    />
+                  )}
 
-			<!-- Breadcrumb End -->
-
-
-			<!-- Blog -->
-
-			<section class="blog-area section-margin-top section-margin-bottom">
-				<div class="container container-semi-large">
-					<div class="row gy-5 gx-lg-5">
-						<div class="col-lg-8">
-							<!-- Details desc -->
-							<div class="blog-single-wrapper">
-								<div class="blog-single-title-info mb-5">
-									<h2 class="h2"><a href="#">{post.title}</a></h2>
-									<div
-										class="blog-single-meta section-border-black pb-3 d-flex align-items-center justify-content-between mt-2 gap-2 flex-wrap">
-										<p class="text_black d-flex align-items-center gap-2 mt-1 flex-wrap">
-											{post.publishDate}
-											<svg width="18" height="2" viewBox="0 0 18 2" fill="none"
-												xmlns="http://www.w3.org/2000/svg">
-												<path opacity="0.14" d="M0 1H18" stroke="#1A1A1A" />
-											</svg>
-											<a href="#">By {post.author}</a>
-										</p>
-										<div class="blog-single-share d-flex align-items-center  gap-2">
-											<span class="fnt-weight-500 text_black">Social Share:</span>
-											<ul class="custom-ul site-social d-flex align-items-center flex-wrap gap-2">
-												<li><a href="#"><i class="bi bi-facebook"></i></a></li>
-												<li><a href="#"><i class="bi bi-linkedin"></i></a></li>
-												<li><a href="#"><i class="bi bi-youtube"></i></a></li>
-											</ul>
-										</div>
-									</div>
-								</div>
-								<img class="w-100 mb-3" src={`https:${post.image.fields.file.url}`} alt="">
-								<div>{contentHtml}</div>
-								<div class="row pt-3 gy-4">
-									<div class="col-sm-6">
-										<img class="w-100" src="/assets/images/blog/details-desc-1.png" alt="">
-									</div>
-									<div class="col-sm-6">
-										<img class="w-100" src="/assets/images/blog/details-desc-2.png" alt="">
-									</div>
-								</div>
-								<h3 class="h3 mt-4 mb-2">User-Centered Focus</h3>
-								<p>The primary objective of UX design is to understand and cater to the needs of the end-user.
-									This approach goes beyond visuals and aesthetics—it delves deep into how users feel when they
-									interact with a product.</p>
-								<blockquote class="wp-block-quote mt-4 mb-4">
-									<p class="mb-3">“Et harum quidem rerum facilis est et expedita distinctio. Nam libero
-										tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod maxime
-										place at facere possimus, omnis voluptas assumenda est, omnis dolor repellendus!”
-									</p>
-									<cite>
-										<svg xmlns="http://www.w3.org/2000/svg" width="50" height="2" viewBox="0 0 50 2"
-											fill="none">
-											<path d="M0 1H50" stroke="#1A1A1A" />
-										</svg>
-										Sarah Thompson
-									</cite>
-								</blockquote>
-								<h3 class="h3 mb-2">User-Centered Focus</h3>
-								<p>The primary objective of UX design is to understand and cater to the needs of the end-user.
-									This approach goes beyond visuals and aesthetics—it delves deep into how users feel when they
-									interact with a product.</p>
-								<div class="blog-single-share mt-lg-5 mt-4 tags d-flex align-items-center  gap-2">
-									<span class="fnt-weight-500 text_black">Tags:</span>
-									<ul class="sidebar-tags custom-ul d-flex flex-wrap gap-2">
-										<li><a href="#">Corporate</a></li>
-										<li><a href="#">Health Care</a></li>
-										<li><a href="#">Technology</a></li>
-										<li><a href="#">Industry</a></li>
-									</ul>
-								</div>
-							</div><!-- Details desc End -->
-
-							<!-- Comments Replay -->
-							<div class="comments-section section-margin-top">
-								<h2 class="mb-4 mb-lg-5 section-border-black pb-3">03 Comments</h2>
-								<div class="comments-wrap">
-									<div class="single-comments-box d-flex flex-column flex-lg-row">
-										<div class="comments-img flex-shrink-0">
-											<img src="/assets/images/blog/reply-1.png" alt="">
-										</div>
-										<div class="comments-info">
-											<h3 class="text_color_white">Patrick Fay</h3>
-											<p class="text_color_light_white">Dictum erat aliquam sit turpis rutrum nulla feugiat
-												sodales ullamcorper. Vulputate consequat nunc nunc condimentum egestas orci.</p>
-											<a href="#" class="text_color_white d-flex align-items-center reply-btn">
-												<svg width="14" height="14" viewBox="0 0 14 14" fill="none"
-													xmlns="http://www.w3.org/2000/svg">
-													<path
-														d="M5.1368 1.85208C5.42363 1.6924 5.79961 1.72357 6.06074 1.92099C6.28141 2.08204 6.41484 2.35029 6.41512 2.62318C6.4184 3.30486 6.41512 3.98654 6.41676 4.66822C7.75441 4.71552 9.08305 5.07865 10.2457 5.74474C11.3777 6.38978 12.3536 7.31837 13.0214 8.43974C13.6462 9.47908 13.9885 10.6849 14 11.8976V11.9641C13.9871 12.0486 13.9538 12.1355 13.8808 12.1858C13.7629 12.278 13.5764 12.255 13.4843 12.1372C13.3965 12.0319 13.4255 11.8842 13.3924 11.7598C13.3254 11.4774 13.1329 11.2463 12.9292 11.0483C12.5267 10.6833 12.0378 10.4315 11.5402 10.2223C10.7486 9.90318 9.91539 9.69619 9.07402 9.56029C8.19602 9.41372 7.30598 9.35056 6.41648 9.33251C6.41621 9.9308 6.41648 10.5288 6.41648 11.1271C6.42004 11.3529 6.42469 11.5941 6.30437 11.7948C6.11762 12.1454 5.67273 12.3297 5.29348 12.2069C5.03891 12.135 4.86555 11.9239 4.67441 11.7554C3.23695 10.4142 1.78336 9.0897 0.381719 7.71076C0.28082 7.60986 0.166797 7.51744 0.0973438 7.39029C0.0369141 7.28365 0.0128516 7.16142 0 7.04111V6.97767C0.00765625 6.78244 0.0738281 6.58447 0.215742 6.44583C1.68355 4.99525 3.20906 3.60509 4.71816 2.19798C4.85324 2.07794 4.97629 1.93958 5.1368 1.85208ZM5.28719 2.46568C3.72613 3.92119 2.1473 5.35837 0.628633 6.85845C0.567383 6.93173 0.567656 7.06079 0.627813 7.13462C2.14676 8.63443 3.72559 10.0719 5.28664 11.5274C5.36293 11.6004 5.45863 11.6822 5.57293 11.6576C5.7277 11.6447 5.84281 11.4946 5.83324 11.3426C5.83434 10.5868 5.83297 9.83072 5.83379 9.07494C5.8327 8.97732 5.86332 8.87396 5.94508 8.8138C6.04133 8.73341 6.1734 8.74736 6.28988 8.749C7.5477 8.76021 8.8077 8.87997 10.0357 9.15806C10.631 9.29669 11.22 9.46923 11.7846 9.70494C12.3121 9.92669 12.8231 10.2015 13.2601 10.5747C13.1936 10.2775 13.1029 9.98603 12.9877 9.70384C12.8983 9.44298 12.7646 9.20072 12.644 8.95353C12.5062 8.72794 12.381 8.49306 12.2183 8.28388C11.0261 6.60224 9.06855 5.5249 7.03008 5.30451C6.72191 5.25474 6.40883 5.26814 6.09875 5.24189C5.95027 5.23122 5.83105 5.09423 5.83488 4.9463C5.8316 4.24439 5.83461 3.54193 5.83352 2.84001C5.8316 2.73912 5.84254 2.63658 5.81738 2.53787C5.78457 2.42083 5.67027 2.33744 5.54996 2.33306C5.44332 2.3213 5.35938 2.39896 5.28719 2.46568Z"
-														fill="currentColor" />
-												</svg>
-												Replay
-											</a>
-										</div>
-									</div>
-									<div class="single-comments-box d-flex flex-column flex-lg-row">
-										<div class="comments-img flex-shrink-0">
-											<img src="/assets/images/blog/reply-2.png" alt="">
-										</div>
-										<div class="comments-info">
-											<h3 class="text_color_white">Judy Treutel</h3>
-											<p class="text_color_light_white">Faucibus orci cras a pulvinar eget pharetra elit vel.
-												Proin enim nunc sagittis velit. Malesuada in pharetra pulvinar tristique amet.</p>
-											<a href="#" class="text_color_white d-flex align-items-center reply-btn">
-												<svg width="14" height="14" viewBox="0 0 14 14" fill="none"
-													xmlns="http://www.w3.org/2000/svg">
-													<path
-														d="M5.1368 1.85208C5.42363 1.6924 5.79961 1.72357 6.06074 1.92099C6.28141 2.08204 6.41484 2.35029 6.41512 2.62318C6.4184 3.30486 6.41512 3.98654 6.41676 4.66822C7.75441 4.71552 9.08305 5.07865 10.2457 5.74474C11.3777 6.38978 12.3536 7.31837 13.0214 8.43974C13.6462 9.47908 13.9885 10.6849 14 11.8976V11.9641C13.9871 12.0486 13.9538 12.1355 13.8808 12.1858C13.7629 12.278 13.5764 12.255 13.4843 12.1372C13.3965 12.0319 13.4255 11.8842 13.3924 11.7598C13.3254 11.4774 13.1329 11.2463 12.9292 11.0483C12.5267 10.6833 12.0378 10.4315 11.5402 10.2223C10.7486 9.90318 9.91539 9.69619 9.07402 9.56029C8.19602 9.41372 7.30598 9.35056 6.41648 9.33251C6.41621 9.9308 6.41648 10.5288 6.41648 11.1271C6.42004 11.3529 6.42469 11.5941 6.30437 11.7948C6.11762 12.1454 5.67273 12.3297 5.29348 12.2069C5.03891 12.135 4.86555 11.9239 4.67441 11.7554C3.23695 10.4142 1.78336 9.0897 0.381719 7.71076C0.28082 7.60986 0.166797 7.51744 0.0973438 7.39029C0.0369141 7.28365 0.0128516 7.16142 0 7.04111V6.97767C0.00765625 6.78244 0.0738281 6.58447 0.215742 6.44583C1.68355 4.99525 3.20906 3.60509 4.71816 2.19798C4.85324 2.07794 4.97629 1.93958 5.1368 1.85208ZM5.28719 2.46568C3.72613 3.92119 2.1473 5.35837 0.628633 6.85845C0.567383 6.93173 0.567656 7.06079 0.627813 7.13462C2.14676 8.63443 3.72559 10.0719 5.28664 11.5274C5.36293 11.6004 5.45863 11.6822 5.57293 11.6576C5.7277 11.6447 5.84281 11.4946 5.83324 11.3426C5.83434 10.5868 5.83297 9.83072 5.83379 9.07494C5.8327 8.97732 5.86332 8.87396 5.94508 8.8138C6.04133 8.73341 6.1734 8.74736 6.28988 8.749C7.5477 8.76021 8.8077 8.87997 10.0357 9.15806C10.631 9.29669 11.22 9.46923 11.7846 9.70494C12.3121 9.92669 12.8231 10.2015 13.2601 10.5747C13.1936 10.2775 13.1029 9.98603 12.9877 9.70384C12.8983 9.44298 12.7646 9.20072 12.644 8.95353C12.5062 8.72794 12.381 8.49306 12.2183 8.28388C11.0261 6.60224 9.06855 5.5249 7.03008 5.30451C6.72191 5.25474 6.40883 5.26814 6.09875 5.24189C5.95027 5.23122 5.83105 5.09423 5.83488 4.9463C5.8316 4.24439 5.83461 3.54193 5.83352 2.84001C5.8316 2.73912 5.84254 2.63658 5.81738 2.53787C5.78457 2.42083 5.67027 2.33744 5.54996 2.33306C5.44332 2.3213 5.35938 2.39896 5.28719 2.46568Z"
-														fill="currentColor" />
-												</svg>
-												Replay
-											</a>
-										</div>
-									</div>
-									<div class="single-comments-box d-flex flex-column flex-lg-row">
-										<div class="comments-img flex-shrink-0">
-											<img src="/assets/images/blog/reply-3.png" alt="">
-										</div>
-										<div class="comments-info">
-											<h3 class="text_color_white">Darrell Steward</h3>
-											<p class="text_color_light_white">Sed pharetra egestas pellentesque felis egestas ac.
-												Eget ac dignissim leo habitant odio vulputate. Mattis orci ac pellentesque tellus.
-											</p>
-											<a href="#" class="text_color_white d-flex align-items-center reply-btn">
-												<svg width="14" height="14" viewBox="0 0 14 14" fill="none"
-													xmlns="http://www.w3.org/2000/svg">
-													<path
-														d="M5.1368 1.85208C5.42363 1.6924 5.79961 1.72357 6.06074 1.92099C6.28141 2.08204 6.41484 2.35029 6.41512 2.62318C6.4184 3.30486 6.41512 3.98654 6.41676 4.66822C7.75441 4.71552 9.08305 5.07865 10.2457 5.74474C11.3777 6.38978 12.3536 7.31837 13.0214 8.43974C13.6462 9.47908 13.9885 10.6849 14 11.8976V11.9641C13.9871 12.0486 13.9538 12.1355 13.8808 12.1858C13.7629 12.278 13.5764 12.255 13.4843 12.1372C13.3965 12.0319 13.4255 11.8842 13.3924 11.7598C13.3254 11.4774 13.1329 11.2463 12.9292 11.0483C12.5267 10.6833 12.0378 10.4315 11.5402 10.2223C10.7486 9.90318 9.91539 9.69619 9.07402 9.56029C8.19602 9.41372 7.30598 9.35056 6.41648 9.33251C6.41621 9.9308 6.41648 10.5288 6.41648 11.1271C6.42004 11.3529 6.42469 11.5941 6.30437 11.7948C6.11762 12.1454 5.67273 12.3297 5.29348 12.2069C5.03891 12.135 4.86555 11.9239 4.67441 11.7554C3.23695 10.4142 1.78336 9.0897 0.381719 7.71076C0.28082 7.60986 0.166797 7.51744 0.0973438 7.39029C0.0369141 7.28365 0.0128516 7.16142 0 7.04111V6.97767C0.00765625 6.78244 0.0738281 6.58447 0.215742 6.44583C1.68355 4.99525 3.20906 3.60509 4.71816 2.19798C4.85324 2.07794 4.97629 1.93958 5.1368 1.85208ZM5.28719 2.46568C3.72613 3.92119 2.1473 5.35837 0.628633 6.85845C0.567383 6.93173 0.567656 7.06079 0.627813 7.13462C2.14676 8.63443 3.72559 10.0719 5.28664 11.5274C5.36293 11.6004 5.45863 11.6822 5.57293 11.6576C5.7277 11.6447 5.84281 11.4946 5.83324 11.3426C5.83434 10.5868 5.83297 9.83072 5.83379 9.07494C5.8327 8.97732 5.86332 8.87396 5.94508 8.8138C6.04133 8.73341 6.1734 8.74736 6.28988 8.749C7.5477 8.76021 8.8077 8.87997 10.0357 9.15806C10.631 9.29669 11.22 9.46923 11.7846 9.70494C12.3121 9.92669 12.8231 10.2015 13.2601 10.5747C13.1936 10.2775 13.1029 9.98603 12.9877 9.70384C12.8983 9.44298 12.7646 9.20072 12.644 8.95353C12.5062 8.72794 12.381 8.49306 12.2183 8.28388C11.0261 6.60224 9.06855 5.5249 7.03008 5.30451C6.72191 5.25474 6.40883 5.26814 6.09875 5.24189C5.95027 5.23122 5.83105 5.09423 5.83488 4.9463C5.8316 4.24439 5.83461 3.54193 5.83352 2.84001C5.8316 2.73912 5.84254 2.63658 5.81738 2.53787C5.78457 2.42083 5.67027 2.33744 5.54996 2.33306C5.44332 2.3213 5.35938 2.39896 5.28719 2.46568Z"
-														fill="currentColor" />
-												</svg>
-												Replay
-											</a>
-										</div>
-									</div>
-								</div>
-							</div><!-- Comments Replay -->
-
-							<div class="contact-form-wrap section-margin-top">
-								<h2>Leave a comment</h2>
-								<form class="contact-form-tools mt-4 d-flex flex-column gap-4" action="#">
-									<input class="w-100" type="text" placeholder="Full Name">
-									<input class="w-100" type="text" placeholder="Subject">
-									<textarea class="w-100" rows="5" cols="50" placeholder="Message"></textarea>
-									<button class="contact-btn d-block w-100 bg-transparent fnt-weight-500">Post comment</button>
-								</form>
-							</div>
-
-						</div>
-						<div class="col-lg-4">
-							<div class="sidebar-wrap">
-								<div class="single-sidebar">
-									<form class="sidebar-search position-relative" action="#">
-										<input class="w-100" type="search" placeholder="Search...">
-										<button class="border-0 p-0 m-0 position-absolute end-0 top-0 bg-transparent"
-											type="submit">
-											<svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-												xmlns="http://www.w3.org/2000/svg">
-												<path
-													d="M10.5 18C14.6421 18 18 14.6421 18 10.5C18 6.35786 14.6421 3 10.5 3C6.35786 3 3 6.35786 3 10.5C3 14.6421 6.35786 18 10.5 18Z"
-													stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
-													stroke-linejoin="round" />
-												<path d="M21 21L16 16" stroke="currentColor" stroke-width="1.5"
-													stroke-linecap="round" stroke-linejoin="round" />
-											</svg>
-										</button>
-									</form>
-								</div>
-								<div class="single-sidebar">
-									<h3 class="h3 sidebar-title d-block">Categories</h3>
-									<ul class="sidebar-category custom-ul d-flex flex-column">
-										<li>Corporate <span>(01)</span></li>
-										<li>Innovative <span>(01)</span></li>
-										<li>Marketing <span>(01)</span></li>
-										<li>Technology <span>(01)</span></li>
-										<li>Creative Design <span>(01)</span></li>
-									</ul>
-								</div>
-								<div class="single-sidebar">
-									<h3 class="h3 sidebar-title d-block">Recent Blogs</h3>
-									<div class="sidebar-recent-blog-wrap d-flex flex-column gap-4">
-										<div
-											class="sidebar-recent-blog d-flex flex-column flex-xl-row align-items-xl-center gap-3">
-											<div class="recent-blog-img w-100">
-												<img class="w-100 ft_object" src="/assets/images/blog/recent-blog-1.png" alt="">
-											</div>
-											<div class="recent-blog-info">
-												<h5 class="recent-blog-title">Creating a brand identity</h5>
-												<p class="text_black d-flex align-items-center gap-2 mt-1 flex-wrap">
-													24 May, 2024
-													<svg width="18" height="2" viewBox="0 0 18 2" fill="none"
-														xmlns="http://www.w3.org/2000/svg">
-														<path opacity="0.14" d="M0 1H18" stroke="#1A1A1A" />
-													</svg>
-													<a href="#">By Anderson</a>
-												</p>
-											</div>
-										</div>
-										<div
-											class="sidebar-recent-blog d-flex flex-column flex-xl-row align-items-xl-center gap-3">
-											<div class="recent-blog-img w-100">
-												<img class="w-100 ft_object" src="/assets/images/blog/recent-blog-2.png" alt="">
-											</div>
-											<div class="recent-blog-info">
-												<h5 class="recent-blog-title">Axole and tech innovators</h5>
-												<p class="text_black d-flex align-items-center gap-2 mt-1 flex-wrap">
-													24 May, 2024
-													<svg width="18" height="2" viewBox="0 0 18 2" fill="none"
-														xmlns="http://www.w3.org/2000/svg">
-														<path opacity="0.14" d="M0 1H18" stroke="#1A1A1A" />
-													</svg>
-													<a href="#">By Anderson</a>
-												</p>
-											</div>
-										</div>
-										<div
-											class="sidebar-recent-blog d-flex flex-column flex-xl-row align-items-xl-center gap-3">
-											<div class="recent-blog-img w-100">
-												<img class="w-100 ft_object" src="/assets/images/blog/recent-blog-3.png" alt="">
-											</div>
-											<div class="recent-blog-info">
-												<h5 class="recent-blog-title">Automation in digital marketing</h5>
-												<p class="text_black d-flex align-items-center gap-2 mt-1 flex-wrap">
-													24 May, 2024
-													<svg width="18" height="2" viewBox="0 0 18 2" fill="none"
-														xmlns="http://www.w3.org/2000/svg">
-														<path opacity="0.14" d="M0 1H18" stroke="#1A1A1A" />
-													</svg>
-													<a href="#">By Anderson</a>
-												</p>
-											</div>
-										</div>
-									</div>
-								</div>
-								<div class="single-sidebar">
-									<h3 class="h3 sidebar-title d-block">Popular Tags</h3>
-									<ul class="sidebar-tags custom-ul d-flex flex-wrap gap-3">
-										<li><a href="#">Corporate</a></li>
-										<li><a href="#">Health Care</a></li>
-										<li><a href="#">Technology</a></li>
-										<li><a href="#">Industry</a></li>
-										<li><a href="#">Marketing</a></li>
-										<li><a href="#">Innovation</a></li>
-									</ul>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</section>
-
-			<!-- Blog End -->
-        </CoreLayoutWhite>
-      </Layout>
-    </>
+                  {/* Main Blog Content (Rendered from Markdown) */}
+                  {/* Apply styling via global styles or a container class */}
+                  <div
+                    class="post-content-area"
+                    set:html={sanitizedHtmlContent}
+                  />
+                </div>
+                {/* Details desc End */}
+              </div>
+            </div>
+          </div>
+        </section>
+        {/* Blog End */}
+      </CoreLayoutWhite>
+    </Layout>
   ) : (
-    <p>Blog not found</p>
+    // Render error state or redirect (redirect handled above)
+    <Layout title="Error loading post">
+      <CoreLayoutWhite>
+        <div class="container" style="padding: 4rem 1rem; text-align: center;">
+          <h2>Oops!</h2>
+          <p>
+            {fetchError ?? "Could not find or load the requested blog post."}
+          </p>
+          <a
+            href="/blog"
+            style="display: inline-block; margin-top: 1rem; text-decoration: underline;"
+          >
+            Back to Blog List
+          </a>
+        </div>
+      </CoreLayoutWhite>
+    </Layout>
   )
 }
+
+{
+  /* Optional: Add global styles for the rendered content if not already handled */
+}
+<style is:global>
+  .post-content-area h2 {
+    margin-top: 2em;
+    margin-bottom: 1em;
+    line-height: 1.3;
+    font-size: 1.8rem;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 0.3em;
+  }
+  .post-content-area h3 {
+    margin-top: 1.8em;
+    margin-bottom: 0.8em;
+    line-height: 1.3;
+    font-size: 1.5rem;
+  }
+  .post-content-area p {
+    margin-bottom: 1.5em;
+    line-height: 1.8;
+  }
+  .post-content-area ul,
+  .post-content-area ol {
+    margin-bottom: 1.5em;
+    padding-left: 1.8em;
+  }
+  .post-content-area li {
+    margin-bottom: 0.5em;
+  }
+  .post-content-area blockquote {
+    border-left: 5px solid #007bff;
+    padding: 1em 1.5em;
+    margin: 1.5em 0;
+    font-style: italic;
+    color: #555;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+  }
+  .post-content-area blockquote p {
+    margin-bottom: 0.5em;
+  }
+  .post-content-area img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+    margin: 1.5em auto;
+    display: block;
+  }
+  .post-content-area pre {
+    background-color: #2d2d2d;
+    color: #f8f8f2;
+    padding: 1.2em;
+    border-radius: 4px;
+    overflow-x: auto;
+    margin: 1.5em 0;
+    font-size: 0.95em;
+  }
+  .post-content-area code {
+    font-family: "Courier New", Courier, monospace;
+  }
+  .post-content-area pre code {
+    background-color: transparent;
+    padding: 0;
+  }
+  .post-content-area :not(pre) > code {
+    background-color: #e9ecef;
+    padding: 0.2em 0.4em;
+    border-radius: 3px;
+    font-size: 0.9em;
+  }
+  .post-content-area a {
+    color: #0056b3;
+    text-decoration: underline;
+  }
+  .post-content-area a:hover {
+    color: #003d80;
+  }
+</style>
